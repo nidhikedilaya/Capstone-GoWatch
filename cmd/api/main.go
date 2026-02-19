@@ -9,12 +9,17 @@ import (
 
 	"gowatch/internal/database"
 	"gowatch/internal/grpc"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
 
-	// Connect to MySQL
-	db, err := database.NewMySQLService("root", "rootroot", "127.0.0.1:3306", "gowatch")
+	// Load .env file (optional but recommended)
+	_ = godotenv.Load()
+
+	// Connect to MySQL using env variables
+	db, err := database.NewMySQLService()
 	if err != nil {
 		log.Fatalf("failed to connect to mysql: %v", err)
 	}
@@ -31,15 +36,16 @@ func main() {
 
 	log.Println("Shutting down...")
 
+	// Stop receiving signals
 	stop()
 
-	// Graceful gRPC
+	// Graceful gRPC shutdown
 	grpcServer.GRPC.GracefulStop()
 
-	// Close DB
+	// Close DB connection
 	db.Close()
 
-	// Close channel
+	// Close the metric channel
 	close(grpc.MetricChan)
 
 	log.Println("Shutdown complete")

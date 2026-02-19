@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -28,9 +29,15 @@ type MySQLService struct {
 	DB *sql.DB
 }
 
-func NewMySQLService(user, pass, host, dbname string) (*MySQLService, error) {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true",
-		user, pass, host, dbname,
+func NewMySQLService() (*MySQLService, error) {
+	user := os.Getenv("DB_USER")
+	pass := os.Getenv("DB_PASSWORD")
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+	dbname := os.Getenv("DB_NAME")
+
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
+		user, pass, host, port, dbname,
 	)
 
 	db, err := sql.Open("mysql", dsn)

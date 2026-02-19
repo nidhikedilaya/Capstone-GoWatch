@@ -7,7 +7,12 @@ import (
 
 func TestDatabase(t *testing.T) {
 
-	db, err := NewMySQLService("root", "rootroot", "127.0.0.1:3306", "gowatch")
+	// Load env vars for testing (if needed, depending on your setup)
+	// You can uncomment this if using godotenv:
+	// godotenv.Load("../.env")
+
+	// Create DB service using env variables
+	db, err := NewMySQLService()
 	if err != nil {
 		t.Fatalf("failed to connect mysql: %v", err)
 	}
