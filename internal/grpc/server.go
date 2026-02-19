@@ -41,6 +41,9 @@ func (s *MetricsServer) SendMetrics(stream pb.MetricsService_SendMetricsServer) 
 }
 
 func StartGRPCServer() {
+	// Start worker pool first (VERY IMPORTANT)
+	StartWorkers(10)
+
 	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {
 		log.Fatal(err)
@@ -54,15 +57,8 @@ func StartGRPCServer() {
 
 	log.Println("gRPC Server running on :50051")
 
+	// This blocks forever, and that's OK
 	if err := server.Serve(lis); err != nil {
-		log.Fatal(err)
-	}
-
-	// Start alerting workers
-	StartWorkers(10)
-
-	lis, err = net.Listen("tcp", ":50051")
-	if err != nil {
 		log.Fatal(err)
 	}
 }
