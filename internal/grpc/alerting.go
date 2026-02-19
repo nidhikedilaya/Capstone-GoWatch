@@ -2,6 +2,7 @@ package grpc
 
 import (
 	pb "gowatch/gopherwatch/pkg/generated"
+	"gowatch/internal/database"
 	"log/slog"
 	"sync"
 )
@@ -52,7 +53,7 @@ func compare(value, threshold float64, cmp string) bool {
 // -------------------- GLOBAL STATE --------------------
 
 var (
-	metricChan = make(chan *pb.MetricReport, 200)
+	MetricChan = make(chan *pb.MetricReport, 200)
 	state      sync.Map // map[string]CurrentState
 )
 
@@ -73,12 +74,12 @@ var rules = []AlertRule{
 
 // -------------------- WORKER POOL --------------------
 
-func StartWorkers(n int) {
+func StartWorkers(n int, db database.Service) {
 	evaluator := SimpleEvaluator{}
 
 	for i := 0; i < n; i++ {
 		go func(id int) {
-			for metric := range metricChan {
+			for metric := range MetricChan {
 
 				// Update state
 				state.Store(metric.AgentId, CurrentState{
@@ -97,6 +98,17 @@ func StartWorkers(n int) {
 							"value", getValue(metric, r.Metric),
 							"threshold", r.Threshold,
 						)
+						// INSERT ALERT INTO DB
+						if db != nil {
+							_ = db.InsertAlert(database.Alert{
+								AgentID:   metric.AgentId,
+								RuleName:  r.Name,
+								Metric:    r.Metric,
+								Value:     getValue(metric, r.Metric),
+								Threshold: r.Threshold,
+								Timestamp: metric.Timestamp,
+							})
+						}
 					}
 				}
 			}

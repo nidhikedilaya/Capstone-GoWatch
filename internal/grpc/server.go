@@ -11,6 +11,8 @@ import (
 	"google.golang.org/grpc"
 )
 
+var globalDB database.Service
+
 type MetricsServer struct {
 	pb.UnimplementedMetricsServiceServer
 }
@@ -31,7 +33,7 @@ func (s *MetricsServer) SendMetrics(stream pb.MetricsService_SendMetricsServer) 
 		}
 
 		// FAN-OUT PATTERN
-		metricChan <- metric
+		MetricChan <- metric
 
 		log.Printf("Received from Agent: %s | CPU: %.2f",
 			metric.AgentId,
@@ -40,9 +42,12 @@ func (s *MetricsServer) SendMetrics(stream pb.MetricsService_SendMetricsServer) 
 	}
 }
 
-func StartGRPCServer() {
-	// Start worker pool first (VERY IMPORTANT)
-	StartWorkers(10)
+type ServerInstance struct {
+	GRPC *grpc.Server
+}
+
+func StartGRPCServer(db database.Service) *ServerInstance {
+	StartWorkers(10, db)
 
 	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {
@@ -55,20 +60,24 @@ func StartGRPCServer() {
 
 	pb.RegisterMetricsServiceServer(server, &MetricsServer{})
 
-	log.Println("gRPC Server running on :50051")
+	go func() {
+		log.Println("gRPC Server running on :50051")
+		if err := server.Serve(lis); err != nil {
+			log.Fatal(err)
+		}
+	}()
 
-	// This blocks forever, and that's OK
-	if err := server.Serve(lis); err != nil {
-		log.Fatal(err)
+	return &ServerInstance{
+		GRPC: server,
 	}
 }
 
-type Server struct {
+type RestServer struct {
 	db database.Service
 }
 
 func StartRESTServer(db database.Service) {
-	srv := &Server{db: db}
+	srv := &RestServer{db: db}
 	err := http.ListenAndServe(":8080", srv.RegisterRoutes())
 	if err != nil {
 		log.Fatalf("REST server error: %v", err)
