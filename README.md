@@ -35,10 +35,10 @@ DB_USER=your_db_username
 DB_PASSWORD=your_db_password
 DB_HOST=localhost_or_ip_addr
 DB_PORT=your_db_port
-DB_NAME=your_db_name```
-To load env variables, add in go.mod (if not added yet):
-```go get github.com/joho/godotenv
+DB_NAME=your_db_name
 ```
+To load env variables, add in go.mod (if not added yet):
+```go get github.com/joho/godotenv```
 
 ## MySQL Setup
 Open MySQL:
