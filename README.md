@@ -35,6 +35,7 @@ gowatch/
 
 ## Environment Variables (Required)
 Create a .env file in the project root:
+
 ```
 DB_USER=your_db_username
 DB_PASSWORD=your_db_password
