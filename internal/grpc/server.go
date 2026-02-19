@@ -17,12 +17,9 @@ type MetricsServer struct {
 
 func (s *MetricsServer) SendMetrics(stream pb.MetricsService_SendMetricsServer) error {
 
-	var count int
-
 	for {
 		metric, err := stream.Recv()
 
-		// When client finishes sending
 		if err == io.EOF {
 			return stream.SendAndClose(&pb.Summary{
 				Message: "Received metrics successfully",
@@ -33,7 +30,8 @@ func (s *MetricsServer) SendMetrics(stream pb.MetricsService_SendMetricsServer) 
 			return err
 		}
 
-		count++
+		// FAN-OUT PATTERN
+		metricChan <- metric
 
 		log.Printf("Received from Agent: %s | CPU: %.2f",
 			metric.AgentId,
@@ -57,6 +55,14 @@ func StartGRPCServer() {
 	log.Println("gRPC Server running on :50051")
 
 	if err := server.Serve(lis); err != nil {
+		log.Fatal(err)
+	}
+
+	// Start alerting workers
+	StartWorkers(10)
+
+	lis, err = net.Listen("tcp", ":50051")
+	if err != nil {
 		log.Fatal(err)
 	}
 }
