@@ -176,6 +176,6 @@ Start app:
 ```
 go run cmd/api/main.go
 # in another terminal
-go run cmd/agent/main.go
+go run cmd/agent/load_test_agents.go
 ```
 
