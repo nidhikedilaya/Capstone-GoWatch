@@ -22,10 +22,15 @@ gowatch/
 
 ## Prerequisites
 ✔ Go 1.21+
+
 ✔ MySQL 8+
+
 ✔ Protocol Buffers
+
 ```brew install protobuf```
+
 ✔ Stress testing tool (macOS)
+
 ```brew install stress-ng```
 
 ## Environment Variables (Required)
@@ -62,18 +67,26 @@ Verify:
 ## Running the Application
 Run the full system:
 ```go run cmd/api/main.go```
+
 This launches:
+
 ✔ gRPC server on :50051
+
 ✔ REST server on :8080
+
 ✔ 10 worker goroutines
+
 ✔ Graceful shutdown handler
 
 ## Challenge 1 — gRPC Metrics Streaming
 Proto file (metrics.proto)
+
 The service:
 ```rpc SendMetrics(stream MetricReport) returns (Summary);```
+
 Agents send metrics continuously:
 ```stream.Send(&MetricReport{CpuUsage: 92.5})```
+
 Backend receives them and fans them out through a channel:
 ```metricChan <- metric```
 
