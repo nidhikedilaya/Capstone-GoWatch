@@ -101,20 +101,28 @@ Alert flow:
 
 To test CPU alerting:
 ```brew install stress-ng```
+
 Run load:
 ```stress-ng --cpu 0 --timeout 30```
+
 Your agent should report high CPU → backend should generate alerts.
 
 Check DB:
 ```SELECT * FROM alerts ORDER BY id DESC;```
 
+
 ## Challenge 3 — REST API + SQL Persistence + Dashboard
 REST server automatically exposes:
+
 *GET /health*
+
 Returns DB health:
 ```{ "database": "UP" }```
+
 *GET /alerts/history*
+
 Returns all stored alerts:
+
 ```
 [
   {
@@ -129,6 +137,7 @@ Returns all stored alerts:
 ]
 ```
 *GET /*
+
 Basic Hello World
 
 
