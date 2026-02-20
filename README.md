@@ -55,12 +55,15 @@ USE gowatch;
 CREATE TABLE alerts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     agent_id VARCHAR(255),
+    service_name VARCHAR(255),
     rule_name VARCHAR(255),
     metric VARCHAR(50),
     value DOUBLE,
     threshold DOUBLE,
     timestamp BIGINT
 );
+
+CREATE INDEX idx_service_timestamp ON alerts (service_name, timestamp);
 ```
 Verify:
 ```SELECT * FROM alerts;```
