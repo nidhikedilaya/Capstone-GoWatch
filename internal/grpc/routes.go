@@ -1,9 +1,11 @@
 package grpc
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 )
 
 func (s *RestServer) RegisterRoutes() http.Handler {
@@ -75,7 +77,11 @@ func (s *RestServer) statusHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *RestServer) alertHistoryHandler(w http.ResponseWriter, r *http.Request) {
-	alerts, err := s.db.GetAlertHistory()
+	// context with timeout for DB call
+	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+	defer cancel()
+
+	alerts, err := s.db.GetAlertHistory(ctx)
 	if err != nil {
 		http.Error(w, "failed to load history", http.StatusInternalServerError)
 		return

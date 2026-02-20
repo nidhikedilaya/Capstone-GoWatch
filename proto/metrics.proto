@@ -14,6 +14,7 @@ message MetricReport {
   double cpu_usage = 3;
   double memory_usage = 4;
   double disk_usage = 5;
+  string service_name = 6;
 }
 
 message Summary {

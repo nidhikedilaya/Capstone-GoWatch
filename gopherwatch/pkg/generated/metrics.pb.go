@@ -7,11 +7,12 @@
 package generated
 
 import (
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
+
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
 const (
@@ -28,6 +29,7 @@ type MetricReport struct {
 	CpuUsage      float64                `protobuf:"fixed64,3,opt,name=cpu_usage,json=cpuUsage,proto3" json:"cpu_usage,omitempty"`
 	MemoryUsage   float64                `protobuf:"fixed64,4,opt,name=memory_usage,json=memoryUsage,proto3" json:"memory_usage,omitempty"`
 	DiskUsage     float64                `protobuf:"fixed64,5,opt,name=disk_usage,json=diskUsage,proto3" json:"disk_usage,omitempty"`
+	ServiceName   string                 `protobuf:"bytes,6,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -97,6 +99,13 @@ func (x *MetricReport) GetDiskUsage() float64 {
 	return 0
 }
 
+func (x *MetricReport) GetServiceName() string {
+	if x != nil {
+		return x.ServiceName
+	}
+	return ""
+}
+
 type Summary struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
@@ -145,18 +154,19 @@ var File_proto_metrics_proto protoreflect.FileDescriptor
 
 const file_proto_metrics_proto_rawDesc = "" +
 	"\n" +
-	"\x13proto/metrics.proto\x12\ametrics\"\xa6\x01\n" +
+	"\x13proto/metrics.proto\x12\ametrics\"\xc9\x01\n" +
 	"\fMetricReport\x12\x19\n" +
 	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1c\n" +
 	"\ttimestamp\x18\x02 \x01(\x03R\ttimestamp\x12\x1b\n" +
 	"\tcpu_usage\x18\x03 \x01(\x01R\bcpuUsage\x12!\n" +
 	"\fmemory_usage\x18\x04 \x01(\x01R\vmemoryUsage\x12\x1d\n" +
 	"\n" +
-	"disk_usage\x18\x05 \x01(\x01R\tdiskUsage\"#\n" +
+	"disk_usage\x18\x05 \x01(\x01R\tdiskUsage\x12!\n" +
+	"\fservice_name\x18\x06 \x01(\tR\vserviceName\"#\n" +
 	"\aSummary\x12\x18\n" +
 	"\amessage\x18\x01 \x01(\tR\amessage2J\n" +
 	"\x0eMetricsService\x128\n" +
-	"\vSendMetrics\x12\x15.metrics.MetricReport\x1a\x10.metrics.Summary(\x01B%Z#gopherwatch/pkg/generated;generatedb\x06proto3"
+	"\vSendMetrics\x12\x15.metrics.MetricReport\x1a\x10.metrics.Summary(\x01B-Z+gowatch/gopherwatch/pkg/generated;generatedb\x06proto3"
 
 var (
 	file_proto_metrics_proto_rawDescOnce sync.Once

@@ -1,10 +1,12 @@
 package grpc
 
 import (
+	"context"
 	pb "gowatch/gopherwatch/pkg/generated"
 	"gowatch/internal/database"
 	"log/slog"
 	"sync"
+	"time"
 )
 
 // -------------------- RULE STRUCTS --------------------
@@ -125,15 +127,20 @@ func StartWorkers(n int, db database.Service) {
 						)
 
 						// -------------------- STORE ALERT IN DB --------------------
-						if db != nil { // database layer is optional for testing
-							_ = db.InsertAlert(database.Alert{
-								AgentID:   metric.AgentId,
-								RuleName:  r.Name,
-								Metric:    r.Metric,
-								Value:     getValue(metric, r.Metric),
-								Threshold: r.Threshold,
-								Timestamp: metric.Timestamp,
+						if db != nil {
+							ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+
+							db.InsertAlert(ctx, database.Alert{
+								AgentID:     metric.AgentId,
+								ServiceName: metric.ServiceName, // ← REQUIRED FIELD
+								RuleName:    r.Name,
+								Metric:      r.Metric,
+								Value:       getValue(metric, r.Metric),
+								Threshold:   r.Threshold,
+								Timestamp:   metric.Timestamp,
 							})
+
+							cancel()
 						}
 					}
 				}
