@@ -83,11 +83,12 @@ func (s *MySQLService) InsertAlert(ctx context.Context, alert Alert) error {
 	defer cancel()
 
 	// Store UNIX time safely using FROM_UNIXTIME
+	// Removed FROM_UNIXTIME()
 	query := `
         INSERT INTO alerts 
             (agent_id, service_name, rule_name, metric, value, threshold, timestamp)
         VALUES 
-            (?, ?, ?, ?, ?, ?, FROM_UNIXTIME(?))
+            (?, ?, ?, ?, ?, ?, ?)
     `
 
 	_, err := s.DB.ExecContext(ctx, query,
@@ -117,6 +118,7 @@ func (s *MySQLService) GetAlertHistory(ctx context.Context) ([]Alert, error) {
 	defer cancel()
 
 	// Return Unix timestamp using UNIX_TIMESTAMP()
+	// Removed UNIX_TIMESTAMP()
 	query := `
         SELECT 
             id, 
@@ -126,7 +128,7 @@ func (s *MySQLService) GetAlertHistory(ctx context.Context) ([]Alert, error) {
             metric, 
             value, 
             threshold, 
-            UNIX_TIMESTAMP(timestamp)
+            timestamp
         FROM alerts
         ORDER BY id DESC
     `
